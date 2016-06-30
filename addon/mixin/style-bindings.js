@@ -1,7 +1,7 @@
 import Em from 'ember';
 
 /**
- * Provides styleBindings property to bind style 
+ * Provides styleBindings property to bind style
  * properties based on object properties.
  *
  * @class StyleBindingsMixin
@@ -47,7 +47,9 @@ export default Em.Mixin.create({
     if (Em.typeOf(value) === "number") {
       value = value + this.get("unit");
     }
-    return styleName + ":" + value + ";";
+
+    value = Em.Handlebars.Utils.escapeExpression(value);
+    return `${styleName}: ${value};`;
   },
 
   /**
@@ -72,7 +74,7 @@ export default Em.Mixin.create({
       style = propArr[1];
       return lookup[style || property] = property;
     });
-    styles = Em.keys(lookup);
+    styles = Object.keys(lookup);
     properties = styles.map(function(style) {
       return lookup[style];
     });
@@ -85,8 +87,9 @@ export default Em.Mixin.create({
       })(this));
       styleString = styleTokens.join("");
       if (styleString.length !== 0) {
-        return styleString;
+        return Em.String.htmlSafe(styleString);
       }
+      return Em.String.htmlSafe('');
     });
     styleComputed.property.apply(styleComputed, properties);
     return Em.defineProperty(this, "style", styleComputed);
